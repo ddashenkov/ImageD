@@ -1,5 +1,4 @@
 import csv
-import math
 import sys
 
 import matplotlib.pyplot as plt
@@ -18,7 +17,6 @@ for file_name in file_names:
             frequencies[label] += 1
 
 freqs = sorted(frequencies.values(), reverse=True)
-# plt.bar(range(len(freqs)), columns)
 bin_count = 100
 plt.xscale('log')
 i, g, patches = plt.hist(freqs, bins=[2 ** x for x in range(0, 25)])
