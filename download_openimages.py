@@ -75,11 +75,15 @@ def download_one_image(bucket, split, image_id, download_folder):
             f'ERROR when downloading image `{split}/{image_id}`: {str(exception)}')
 
 
-def download_all_images(args):
-    """Downloads all images specified in the input file."""
-    bucket = boto3.resource(
+def build_bucket():
+    return boto3.resource(
         's3', config=botocore.config.Config(
             signature_version=botocore.UNSIGNED)).Bucket(BUCKET_NAME)
+
+
+def download_all_images(args):
+    """Downloads all images specified in the input file."""
+    bucket = build_bucket()
 
     download_folder = args['download_folder'] or os.getcwd()
 
