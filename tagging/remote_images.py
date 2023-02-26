@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-import numpy as np
 from PIL import Image
+
 from download_openimages import build_bucket
 
 _CACHE_DIR = Path.home() / 'ImageD_OpenImages'
@@ -19,10 +19,11 @@ def _ensure_cache_dir():
         _CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_image(image_id, split="train") -> np.ndarray:
+def load_image(image_id, split="train") -> Image.Image:
     _ensure_cache_dir()
     file_path = _CACHE_DIR / f'{image_id}.jpg'
     if not file_path.exists():
         _download_image(image_id, split)
     img = Image.open(file_path)
-    return np.asarray(img)
+    return img
+
