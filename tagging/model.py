@@ -3,8 +3,7 @@ import pathlib
 import numpy as np
 import torch
 
-from remote_images import load_image
-from tags import tags
+from tags import tag_mask_size
 
 _DEFAULT_STATE_PATH = '~/ImageD/tagging/state.pt'
 
@@ -18,7 +17,11 @@ def _load_pretrain() -> torch.nn.Module:
 
 def _load_head(path) -> torch.nn.Module:
     state_path = pathlib.Path(path)
-    fully_connected = torch.nn.Linear(2048, len(tags()))
+    fully_connected = torch.nn.Sequential(
+        torch.nn.Linear(2048, tag_mask_size()),
+        torch.nn.Sigmoid()
+    )
+    print(fully_connected)
     if state_path.exists():
         fully_connected.load_state_dict(torch.load(path))
     return fully_connected
@@ -36,7 +39,7 @@ class TaggingModel(torch.nn.Module):
         return self.core_model(x)
 
     def store_progress(self, path=_DEFAULT_STATE_PATH):
-        torch.save(self.head.state_dict(), path)
+        torch.save(self.head.state_dict(), pathlib.Path(path).expanduser())
 
 
 def model(inference=False, path_to_state=_DEFAULT_STATE_PATH) -> TaggingModel:
@@ -51,6 +54,6 @@ def model(inference=False, path_to_state=_DEFAULT_STATE_PATH) -> TaggingModel:
 if __name__ == '__main__':
     m = model()
     from tagging.dataset import TaggingDataset
-    ds = TaggingDataset({'000002b97e5471a0': np.zeros(601)})
-    tensor = next(iter(ds))['image']
+    ds = TaggingDataset({'000002b97e5471a0': np.zeros(tag_mask_size())})
+    tensor = next(iter(ds))[0]
     print(m(tensor))

@@ -25,5 +25,6 @@ def load_image(image_id, split="train") -> Image.Image:
     if not file_path.exists():
         _download_image(image_id, split)
     img = Image.open(file_path)
+    img = img.convert('RGB')
     return img
 

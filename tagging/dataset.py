@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import PIL.Image
 import numpy as np
@@ -7,7 +7,7 @@ import remote_images
 import torchvision.transforms as transforms
 
 
-def _prepare_image(image: PIL.Image.Image):
+def _prepare_image(image: PIL.Image.Image) -> torch.Tensor:
     img_transforms = transforms.Compose(
         [transforms.Resize(256), transforms.CenterCrop(224), transforms.ToTensor()]
     )
@@ -22,7 +22,11 @@ def _prepare_image(image: PIL.Image.Image):
         input = img.unsqueeze(0)\
             .sub_(mean)\
             .div_(std)
-    return input
+    return input.squeeze()
+
+
+def _mask_to_class_indexes(mask: np.ndarray):
+    return np.nonzero(mask)[0]
 
 
 class TaggingDataset(torch.utils.data.IterableDataset):
@@ -33,7 +37,8 @@ class TaggingDataset(torch.utils.data.IterableDataset):
         self.data = data
         self.split = split
 
-    def __iter__(self) -> Dict:
+    def __iter__(self) -> Tuple[torch.Tensor, torch.Tensor]:
         for image_id, mask in self.data.items():
             image = remote_images.load_image(image_id, self.split)
-            yield {'image': _prepare_image(image), 'mask': mask}
+            # yield _prepare_image(image), torch.from_numpy(_mask_to_class_indexes(mask))
+            yield _prepare_image(image), torch.from_numpy(mask).float()
