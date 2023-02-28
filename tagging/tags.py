@@ -39,7 +39,7 @@ def _extract_tags(tokenized_definitions) -> np.ndarray:
             frequency_per_definition[word] += 1
 
     definitions_count = len(tokenized_definitions)
-    threshold = definitions_count / 100
+    threshold = definitions_count * 0.002
     tags = [word for word, freq in frequency_per_definition.items() if freq < threshold]
     tags.sort()
     return tags
@@ -65,7 +65,7 @@ def _prepare_tags() -> Dict[str, np.ndarray]:
     return result
 
 
-def attach_tags(dataset: np.ndarray, label='train-split', cache_dir=_DEFAULT_CACHE_DIR) -> Dict[str, np.ndarray]:
+def attach_tags(dataset: np.ndarray) -> Dict[str, np.ndarray]:
     global _common_tags
     if _common_tags is None:
         _common_tags = _prepare_tags()
@@ -93,3 +93,7 @@ def tag_mask_size() -> int:
         first = next(iter(t.values()))
         _mask_size = first.shape[0]
     return _mask_size
+
+
+if __name__ == '__main__':
+    print(tag_mask_size())
