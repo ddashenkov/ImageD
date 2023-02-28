@@ -15,7 +15,7 @@ from tqdm import tqdm
 def _loader() -> DataLoader:
     data = attach_tags(read_train())
     ds = TaggingDataset(data)
-    return DataLoader(ds, batch_size=8, drop_last=True)
+    return DataLoader(ds, batch_size=16, drop_last=True)
 
 
 def _epoch(epoch_number, dataloader, model, loss_fn, optimizer, max_batches):
@@ -28,7 +28,7 @@ def _epoch(epoch_number, dataloader, model, loss_fn, optimizer, max_batches):
         loss.backward()
         optimizer.step()
 
-        if batch % 5 == 4:
+        if batch % 100 == 99:
             loss_value, current = loss.item(), (batch + 1) * len(X)
             print(f"Loss: {loss_value:>7f} @ {batch}")
             with open(pathlib.Path("~/ImageD/tagging/loss.csv").expanduser(), 'a+') as loss_log:
@@ -49,4 +49,4 @@ def train(epochs=1, max_batches=None) -> model.TaggingModel:
 
 
 if __name__ == '__main__':
-    train(20)
+    train(20, 1000)
