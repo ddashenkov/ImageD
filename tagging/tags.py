@@ -66,20 +66,9 @@ def _prepare_tags() -> Dict[str, np.ndarray]:
 
 
 def attach_tags(dataset: np.ndarray, label='train-split', cache_dir=_DEFAULT_CACHE_DIR) -> Dict[str, np.ndarray]:
-    cache_path_raw = f'{cache_dir}/{label}.bin'
-    cache_path = pathlib.Path(cache_path_raw)
-    if cache_path.exists():
-        with open(cache_path, 'rb') as cache_file:
-            try:
-                print('Loading tags from cache.')
-                return pickle.load(cache_file)
-            except pickle.UnpicklingError as e:
-                print('Failed to load tags, restoring manually.')
-
     global _common_tags
     if _common_tags is None:
         _common_tags = _prepare_tags()
-
     mask_dimension = len(next(iter(_common_tags.values())))
     records = defaultdict(lambda: np.zeros(mask_dimension))
     for image_record in tqdm(dataset, 'Attaching tags to dataset'):
@@ -87,9 +76,6 @@ def attach_tags(dataset: np.ndarray, label='train-split', cache_dir=_DEFAULT_CAC
         label = image_record[1]
         mask = _common_tags[label]
         records[image_id] = np.logical_or(records[image_id], mask)
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(cache_path_raw, 'wb+') as cache_file:
-        pickle.dump(dict(records), cache_file)
     return records
 
 
