@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.getcwd())
+
 from typing import Dict, Tuple
 
 import PIL.Image

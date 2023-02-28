@@ -1,8 +1,8 @@
-import pathlib
 import sys
 import os
 sys.path.insert(0, os.getcwd())
 
+import pathlib
 import torch
 from dataset import read_train
 from tags import attach_tags
